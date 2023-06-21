@@ -73,6 +73,7 @@ func AppendDependncies(artifactMap map[string]ArtifactMap, parentArtifact *artif
 			Version:      dependencyVersion,
 			Dependencies: []*artifact.Artifact{},
 		}
+		AppendDependncies(artifactMap, dependencyArtifact)
 		parentArtifact.Dependencies = append(parentArtifact.Dependencies, dependencyArtifact)
 	}
 }
