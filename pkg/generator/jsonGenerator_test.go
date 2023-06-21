@@ -72,14 +72,14 @@ func TestGenerateJson(t *testing.T) {
 			targetFileName := filepath.Join(tmpDir, "dependency_tree.json")
 			err = GenerateJson(tt.rootArtifact, targetFileName)
 			if err != nil {
-				t.Errorf("Failed to generate JSON: %v", err)
+				t.Fatalf("Failed to generate JSON: %v", err)
 			}
 
 			// Check if the JSON file was generated correctly
 			_, err = os.Stat(targetFileName)
 
 			if os.IsNotExist(err) {
-				t.Error("JSON file doesn't exist")
+				t.Fatal("JSON file doesn't exist")
 			}
 
 			// Read the content of teh JSON file
@@ -135,7 +135,7 @@ func TestGenerateJson(t *testing.T) {
 			generatedJSONStr := removeWhitespace(string(generatedJSON))
 
 			if expectedJSONStr != generatedJSONStr {
-				t.Errorf("Generated JSON does not match expected. \nExpected: %s \nGenerated: %s", expectedJSONStr, generatedJSONStr)
+				t.Fatalf("Generated JSON does not match expected. \nExpected: %s \nGenerated: %s", expectedJSONStr, generatedJSONStr)
 			}
 
 		})

@@ -62,5 +62,4 @@ func TestGenerateDependencyMap(t *testing.T) {
 	if artifactMap["github.com/ramessesii2/depviz/pkg/generator"].Visited != false {
 		t.Errorf("artifactMap has incorrect visited status, got: %t, want: %t", artifactMap["github.com/ramessesii2/depviz/pkg/generator"].Visited, false)
 	}
-
 }
