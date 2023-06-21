@@ -72,8 +72,13 @@ func App(repoURL, ref string) {
 		Dependencies: []*artifact.Artifact{},
 	}
 
+	// Get all the Dependencies modules in string format
+	modules, err := generator.GetDependencies(tmpDir)
+	if err != nil {
+		log.Fatal("Failed to get dependencies:", err)
+	}
 	// Generate the dependency Map
-	depMap, err := generator.GenerateDependencyMap(tmpDir)
+	depMap := generator.GenerateDependencyMap(modules)
 	if err != nil {
 		log.Fatal("Failed to generate dependency tree:", err)
 	}

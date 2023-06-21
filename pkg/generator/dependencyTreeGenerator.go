@@ -16,18 +16,7 @@ type ArtifactMap struct {
 
 // GenerateDependencyMap generates a map having key as parent artifact and value as its dependencies using ArtifacMap
 // This is helpful to track the dependencies of each artifact
-func GenerateDependencyMap(repoDir string) (map[string]ArtifactMap, error) {
-	// get the dependency text file using go mod graph
-	goModGraphCmd := exec.Command("go", "mod", "graph")
-	goModGraphCmd.Dir = repoDir
-	modGraphOutput, err := goModGraphCmd.Output()
-	if err != nil {
-		return map[string]ArtifactMap{}, fmt.Errorf("failed to run 'go mod graph': %w", err)
-	}
-	modules := strings.Split(string(modGraphOutput), "\n")
-	// remove the last empty line
-	modules = modules[:len(modules)-1]
-
+func GenerateDependencyMap(modules []string) map[string]ArtifactMap {
 	// create a map of parent artifact and its dependencies to track the dependencies
 	// of each artifact
 	artifactMap := make(map[string]ArtifactMap)
@@ -48,7 +37,24 @@ func GenerateDependencyMap(repoDir string) (map[string]ArtifactMap, error) {
 		}
 	}
 
-	return artifactMap, nil
+	return artifactMap
+}
+
+func GetDependencies(repoDir string) ([]string, error) {
+	// get the dependency text file using go mod graph
+	goModGraphCmd := exec.Command("go", "mod", "graph")
+	goModGraphCmd.Dir = repoDir
+	modGraphOutput, err := goModGraphCmd.Output()
+	if err != nil {
+		return []string{}, fmt.Errorf("failed to run 'go mod graph': %w", err)
+	}
+
+	modules := strings.Split(string(modGraphOutput), "\n")
+
+	// remove the last empty line
+	modules = modules[:len(modules)-1]
+
+	return modules, nil
 }
 
 // AppendDependencies appends the dependencies of each artifact using ArtifactMap
