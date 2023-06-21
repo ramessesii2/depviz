@@ -14,7 +14,7 @@ import (
 	"github.com/ramessesii2/depviz/pkg/util"
 )
 
-func App(repoURL, ref string) error {
+func App(repoURL, ref string) {
 
 	// Clone the repository to a temporary directory
 	currentDir, err := util.FindRootDir()
@@ -59,7 +59,9 @@ func App(repoURL, ref string) error {
 	} else if isBranch := util.IsRefBranch(tmpDir, ref); err != nil {
 		log.Fatal("Failed to check if ref is a branch:", err)
 	} else if isBranch {
-		version = "latest"
+		if ref == "main" {
+			version = "latest"
+		}
 	} else {
 		version = ""
 	}
@@ -92,7 +94,7 @@ func App(repoURL, ref string) error {
 	}
 
 	// Generate the JSON file
-	generator.GenerateJson(rootArtifact, currentDir)
-
-	return nil
+	targetFileName := currentDir + "/dependency_tree.json"
+	generator.GenerateJson(rootArtifact, targetFileName)
+	fmt.Println("Dependency Tree generated successfully. Output file:", targetFileName)
 }

@@ -14,10 +14,7 @@ func Root() *cobra.Command {
 			repo, _ := cmd.Flags().GetString("repo")
 			ref, _ := cmd.Flags().GetString("ref")
 
-			err := app.App(repo, ref)
-			if err != nil {
-				panic(err)
-			}
+			app.App(repo, ref)
 		},
 	}
 
