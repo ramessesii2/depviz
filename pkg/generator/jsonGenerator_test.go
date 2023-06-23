@@ -67,7 +67,7 @@ func TestGenerateJson(t *testing.T) {
 			if err != nil {
 				t.Fatal("Failed to create temporary directory: ", err)
 			}
-			// defer os.RemoveAll(tmpDir)
+			defer os.RemoveAll(tmpDir)
 
 			targetFileName := filepath.Join(tmpDir, "dependency_tree.json")
 			err = GenerateJson(tt.rootArtifact, targetFileName)

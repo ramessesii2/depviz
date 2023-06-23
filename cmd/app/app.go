@@ -47,9 +47,6 @@ func App(repoURL, ref string) {
 	if err != nil {
 		log.Fatal("Failed to get module info:", err)
 	}
-	// else {
-	// 	fmt.Println("modInfoOutput:", string(modInfoOutput))
-	// }
 
 	var data map[string]interface{}
 
