@@ -22,6 +22,7 @@ func App(repoURL, ref string) {
 		log.Fatal("Failed to get current directory:", err)
 	}
 	tmpDir, err := ioutil.TempDir(currentDir, "go-cloned-repo-temp")
+
 	if err != nil {
 		log.Fatal("Failed to create temporary directory:", err)
 	}
@@ -29,7 +30,14 @@ func App(repoURL, ref string) {
 
 	cmd := exec.Command("git", "clone", "--depth", "1", "--branch", ref, repoURL, tmpDir)
 	if err := cmd.Run(); err != nil {
-		log.Fatal("Failed to clone repository:", err)
+		errMsg := "Failed to clone repository"
+		if exitError, ok := err.(*exec.ExitError); ok {
+			// Check if the exit status is 0 or 1
+			if exitError.ExitCode() == 1 {
+				log.Fatal(errMsg + ": Command is invalid")
+			}
+		}
+		log.Fatal(errMsg)
 	}
 
 	// Get the module name
@@ -79,14 +87,28 @@ func App(repoURL, ref string) {
 	}
 	// Generate the dependency Map
 	depMap := generator.GenerateDependencyMap(modules)
+	dependencyGeneratorInitializer(depMap, rootArtifact)
 	if err != nil {
 		log.Fatal("Failed to generate dependency tree:", err)
 	}
 
+	// Generate the JSON file
+	targetFileName := currentDir + "/dependency_tree.json"
+	generator.GenerateJson(rootArtifact, targetFileName)
+	fmt.Println("Dependency Tree generated successfully. Output file:", targetFileName)
+}
+
+func dependencyGeneratorInitializer(depMap map[string]generator.ArtifactMap, rootArtifact *artifact.Artifact) error {
 	// Generate the dependency tree for the root artifact
 	for _, dependency := range depMap[rootArtifact.Name].Dependencies {
-		dependencyName := strings.Split(dependency, "@")[0]
-		dependencyVersion := strings.Split(dependency, "@")[1]
+		splitDependency := strings.Split(dependency, "@")
+		var dependencyName, dependencyVersion string
+		if len(splitDependency) >= 2 {
+			dependencyName = splitDependency[0]
+			dependencyVersion = splitDependency[1]
+		} else {
+			return fmt.Errorf("failed to split dependency: %s", dependency)
+		}
 		dependencyArtifact := &artifact.Artifact{
 			Name:         dependencyName,
 			Version:      dependencyVersion,
@@ -97,9 +119,5 @@ func App(repoURL, ref string) {
 		// Append the dependency artifact to the root artifact
 		rootArtifact.Dependencies = append(rootArtifact.Dependencies, dependencyArtifact)
 	}
-
-	// Generate the JSON file
-	targetFileName := currentDir + "/dependency_tree.json"
-	generator.GenerateJson(rootArtifact, targetFileName)
-	fmt.Println("Dependency Tree generated successfully. Output file:", targetFileName)
+	return nil
 }
