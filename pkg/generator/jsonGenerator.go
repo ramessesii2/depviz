@@ -2,7 +2,7 @@ package generator
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 
 	"github.com/ramessesii2/depviz/pkg/artifact"
 )
@@ -15,7 +15,7 @@ func GenerateJson(rootArtifact *artifact.Artifact, outputFileName string) error 
 	}
 
 	// Write the JSON data to a file
-	err = ioutil.WriteFile(outputFileName, jsonData, 0644)
+	err = os.WriteFile(outputFileName, jsonData, 0644)
 	if err != nil {
 		return err
 	}

@@ -3,7 +3,6 @@ package app
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -21,7 +20,7 @@ func App(repoURL, ref string) {
 	if err != nil {
 		log.Fatal("Failed to get current directory:", err)
 	}
-	tmpDir, err := ioutil.TempDir(currentDir, "go-cloned-repo-temp")
+	tmpDir, err := os.MkdirTemp(currentDir, "go-cloned-repo-temp")
 
 	if err != nil {
 		log.Fatal("Failed to create temporary directory:", err)
@@ -52,7 +51,7 @@ func App(repoURL, ref string) {
 
 	err = json.Unmarshal(modInfoOutput, &data)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	var version string
